@@ -1,35 +1,36 @@
 const express = require('express');
 const cors = require("cors");
 const dotenv = require("dotenv");
-const mongoose = require('mongoose');
 const cookieParser = require("cookie-parser");
-
+const database = require("./config/database");
 const app = express();
-const port = 3177;
+
+
+const PORT = process.env.PORT || 4000;
 
 dotenv.config();
 
-app.use(cookieParser());
+// Connecting to database
+database.connect();
+ 
+// Middlewares
 app.use(express.json());
+app.use(cookieParser());
 app.use(
 	cors({
-		origin: [
-			"http://localhost:3000",
-		],
+		origin: "*",
 		credentials: true,
 	})
 );
 
-
-mongoose.connect(process.env.CONNECT, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, (e) => {
-	console.log(e ? e : "Connected successfully to database");
-});
-
+//ROUTES
 app.use("/auth", require("./routers/authRouter"));
 app.use("/user", require("./routers/userRouter"));
 app.use("/bank", require("./routers/bankRouter"));
 app.use("/camps", require("./routers/campRouter"));
 
-app.listen(port, () =>
-	console.log(`Server running at http://localhost:${port}`)
-);
+
+// Listening to the server
+app.listen(PORT, () => {
+	console.log(`App is listening at ${PORT}`);
+});
